@@ -3,6 +3,7 @@ package com.starshootercity.dispensercauldrons;
 import io.papermc.paper.event.block.BlockPreDispenseEvent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.data.Directional;
@@ -13,17 +14,17 @@ import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
-
 public class DispenserCauldrons extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         Bukkit.getPluginManager().registerEvents(this, this);
     }
 
     @EventHandler
     public void onBlockPreDispense(BlockPreDispenseEvent event) {
         if (event.getBlock().getBlockData() instanceof Directional directional) {
+            if (directional.getFacing() == BlockFace.DOWN && !getConfig().getBoolean("allow-interaction-from-below")) return;
             Block block = event.getBlock().getRelative(directional.getFacing());
             if (Tag.CAULDRONS.isTagged(block.getType())) {
                 Material material;
@@ -31,16 +32,19 @@ public class DispenserCauldrons extends JavaPlugin implements Listener {
                 Sound sound;
                 switch (event.getItemStack().getType()) {
                     case WATER_BUCKET -> {
+                        if (!getConfig().getBoolean("enable-water")) return;
                         material = Material.WATER_CAULDRON;
                         sound = Sound.ITEM_BUCKET_EMPTY;
                         itemReplacement = Material.BUCKET;
                     }
                     case LAVA_BUCKET -> {
+                        if (!getConfig().getBoolean("enable-lava")) return;
                         material = Material.LAVA_CAULDRON;
                         sound = Sound.ITEM_BUCKET_EMPTY_LAVA;
                         itemReplacement = Material.BUCKET;
                     }
                     case POWDER_SNOW_BUCKET -> {
+                        if (!getConfig().getBoolean("enable-powder-snow")) return;
                         material = Material.POWDER_SNOW_CAULDRON;
                         sound = Sound.ITEM_BUCKET_EMPTY_POWDER_SNOW;
                         itemReplacement = Material.BUCKET;
@@ -49,15 +53,18 @@ public class DispenserCauldrons extends JavaPlugin implements Listener {
                         if (block.getType() == Material.CAULDRON) return;
                         material = Material.CAULDRON;
                         switch (block.getType()) {
-                            case LAVA_CAULDRON -> {
-                                sound = Sound.ITEM_BUCKET_FILL_LAVA;
-                                itemReplacement = Material.LAVA_BUCKET;
-                            }
                             case WATER_CAULDRON -> {
+                                if (!getConfig().getBoolean("enable-water")) return;
                                 sound = Sound.ITEM_BUCKET_FILL;
                                 itemReplacement = Material.WATER_BUCKET;
                             }
+                            case LAVA_CAULDRON -> {
+                                if (!getConfig().getBoolean("enable-lava")) return;
+                                sound = Sound.ITEM_BUCKET_FILL_LAVA;
+                                itemReplacement = Material.LAVA_BUCKET;
+                            }
                             case POWDER_SNOW_CAULDRON -> {
+                                if (!getConfig().getBoolean("enable-powder-snow")) return;
                                 sound = Sound.ITEM_BUCKET_FILL_POWDER_SNOW;
                                 itemReplacement = Material.POWDER_SNOW_BUCKET;
                             }
@@ -90,11 +97,24 @@ public class DispenserCauldrons extends JavaPlugin implements Listener {
     public void onBlockDispense(BlockDispenseEvent event) {
         if (event.getBlock().getType() != Material.DISPENSER) return;
         if (event.getBlock().getBlockData() instanceof Directional directional) {
+            if (directional.getFacing() == BlockFace.DOWN && !getConfig().getBoolean("allow-interaction-from-below")) return;
             Block block = event.getBlock().getRelative(directional.getFacing());
             if (Tag.CAULDRONS.isTagged(block.getType())) {
-                if (List.of(Material.WATER_BUCKET, Material.LAVA_BUCKET, Material.POWDER_SNOW_BUCKET, Material.BUCKET).contains(event.getItem().getType())) {
-                    event.setCancelled(true);
+                switch (event.getItem().getType()) {
+                    case WATER_BUCKET -> {
+                        if (!getConfig().getBoolean("enable-water")) return;
+                    }
+                    case LAVA_BUCKET -> {
+                        if (!getConfig().getBoolean("enable-lava")) return;
+                    }
+                    case POWDER_SNOW_BUCKET -> {
+                        if (!getConfig().getBoolean("enable-powder-snow")) return;
+                    }
+                    default -> {
+                        return;
+                    }
                 }
+                event.setCancelled(true);
             }
         }
     }

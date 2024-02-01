@@ -18,8 +18,11 @@ public class DispenserCauldrons extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        updateConfig();
         Bukkit.getPluginManager().registerEvents(this, this);
     }
+
+    private void updateConfig() {}
 
     @EventHandler
     public void onBlockPreDispense(BlockPreDispenseEvent event) {

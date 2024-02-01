@@ -9,3 +9,6 @@ enable-lava: true
 
 # Enable placing and removing powder snow
 enable-powder-snow: true
+
+# Configuration version - do not touch this!
+config-version: 1.0.0

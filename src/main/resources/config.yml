@@ -1,0 +1,11 @@
+# Allow dispensers to interact with cauldrons from below
+allow-interaction-from-below: true
+
+# Enable placing and removing water
+enable-water: true
+
+# Enable placing and removing lava
+enable-lava: true
+
+# Enable placing and removing powder snow
+enable-powder-snow: true

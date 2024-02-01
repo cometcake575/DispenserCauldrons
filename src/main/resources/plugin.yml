@@ -1,0 +1,9 @@
+name: DispenserCauldrons
+version: 1.0.0
+main: com.starshootercity.dispensercauldrons.DispenserCauldrons
+description: Allows dispensers to pick up and place liquids in cauldrons like they can with regular liquids
+api-version: '1.20'
+author: cometcake575
+
+depend:
+  - Origins-Reborn
